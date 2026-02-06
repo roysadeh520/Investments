@@ -41,6 +41,7 @@ export const DEFAULT_STATE: AppState = {
     rentalTaxTrack: '10percent',
     renovationCost: 0,
     annualInsurance: 2000,
+    cpiLinkedYears: 25,
   },
 };
 

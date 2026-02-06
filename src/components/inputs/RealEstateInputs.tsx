@@ -94,15 +94,26 @@ export default function RealEstateInputs({ values, onChange }: Props) {
               step={1}
             />
             {values.cpiLinkedPercent > 0 && (
-              <PercentInput
-                label="ריבית צמוד מדד"
-                value={values.cpiLinkedInterestRate}
-                onChange={(v) => update('cpiLinkedInterestRate', v)}
-                tooltip={TOOLTIPS.re_cpiLinkedInterestRate}
-                min={0}
-                max={15}
-                step={0.1}
-              />
+              <>
+                <PercentInput
+                  label="ריבית צמוד מדד"
+                  value={values.cpiLinkedInterestRate}
+                  onChange={(v) => update('cpiLinkedInterestRate', v)}
+                  tooltip={TOOLTIPS.re_cpiLinkedInterestRate}
+                  min={0}
+                  max={15}
+                  step={0.1}
+                />
+                <NumberInput
+                  label="שנות מסלול צמוד מדד"
+                  value={values.cpiLinkedYears}
+                  onChange={(v) => update('cpiLinkedYears', Math.max(1, Math.min(30, Math.round(v))))}
+                  tooltip={TOOLTIPS.re_cpiLinkedYears}
+                  prefix=""
+                  min={1}
+                  max={30}
+                />
+              </>
             )}
           </div>
         </div>
@@ -139,9 +150,10 @@ export default function RealEstateInputs({ values, onChange }: Props) {
             <SelectInput
               label="מסלול מס שכירות"
               value={values.rentalTaxTrack}
-              onChange={(v) => update('rentalTaxTrack', v as 'exempt' | '10percent' | 'marginal')}
+              onChange={(v) => update('rentalTaxTrack', v as 'none' | 'exempt' | '10percent' | 'marginal')}
               tooltip={TOOLTIPS.re_rentalTaxTrack}
               options={[
+                { value: 'none', label: 'ללא מס (0%)' },
                 { value: '10percent', label: '10% מס ברוטו' },
                 { value: 'exempt', label: 'פטור (עד 5,654 ₪/חודש)' },
                 { value: 'marginal', label: 'מס שולי' },

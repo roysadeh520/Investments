@@ -10,7 +10,7 @@ export function calculateRealEstate(
 ): RealEstateResult {
   const {
     apartmentPrice, mortgagePercent, mortgageYears, mortgageInterestRate,
-    cpiLinkedPercent, cpiLinkedInterestRate, annualAppreciation,
+    cpiLinkedPercent, cpiLinkedInterestRate, cpiLinkedYears, annualAppreciation,
     monthlyRent, annualRentIncrease, vacancyRatePercent,
     annualMaintenanceCost, isFirstApartment, lawyerAndAgentPercent,
     rentalTaxTrack, renovationCost, annualInsurance,
@@ -25,12 +25,15 @@ export function calculateRealEstate(
 
   // ========== MORTGAGE ==========
   const totalMortgage = apartmentPrice * (mortgagePercent / 100);
+  const effectiveCpiYears = cpiLinkedPercent > 0 ? cpiLinkedYears : mortgageYears;
+  const maxMortgageYears = Math.max(mortgageYears, effectiveCpiYears);
   const mortgage = calculateFullMortgage(
     totalMortgage,
     cpiLinkedPercent,
     mortgageInterestRate,
     cpiLinkedInterestRate,
     mortgageYears,
+    effectiveCpiYears,
     inflationRate
   );
 
@@ -46,7 +49,7 @@ export function calculateRealEstate(
     const propertyValue = apartmentPrice * Math.pow(1 + annualAppreciation / 100, year);
 
     // Remaining mortgage balance
-    const mortgageMonth = Math.min(year * 12, mortgageYears * 12);
+    const mortgageMonth = Math.min(year * 12, maxMortgageYears * 12);
     const remainingMortgageBalance = mortgage.balanceAtMonth(mortgageMonth);
 
     // Equity = property value - remaining debt
@@ -64,7 +67,7 @@ export function calculateRealEstate(
       totalMaintenanceCosts += yearMaintenance;
 
       // Mortgage payments for this year (only if still within mortgage period)
-      if (year <= mortgageYears) {
+      if (year <= maxMortgageYears) {
         for (let m = (year - 1) * 12 + 1; m <= year * 12; m++) {
           totalMortgagePaid += mortgage.paymentAtMonth(m);
         }
@@ -89,7 +92,7 @@ export function calculateRealEstate(
   // Property
   const futurePropertyValue = apartmentPrice * Math.pow(1 + annualAppreciation / 100, years);
   const appreciation = futurePropertyValue - apartmentPrice;
-  const remainingMortgage = mortgage.balanceAtMonth(Math.min(years * 12, mortgageYears * 12));
+  const remainingMortgage = mortgage.balanceAtMonth(Math.min(years * 12, maxMortgageYears * 12));
   const equity = futurePropertyValue - remainingMortgage;
 
   // Capital gains tax (on property appreciation)
@@ -136,7 +139,7 @@ export function calculateRealEstate(
   const realProfit = realNetProfit;
 
   // Monthly payment at the end of the period
-  const monthlyPaymentAtEnd = years <= mortgageYears
+  const monthlyPaymentAtEnd = years <= maxMortgageYears
     ? mortgage.paymentAtMonth(years * 12)
     : 0;
 

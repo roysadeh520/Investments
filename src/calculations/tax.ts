@@ -54,6 +54,9 @@ export function calculateRentalTax(
   const monthlyIncome = annualRentalIncome / 12;
 
   switch (track) {
+    case 'none':
+      return 0;
+
     case 'exempt':
       if (monthlyIncome <= ISRAELI_TAX.rental.exemptMonthlyThreshold) {
         return 0;

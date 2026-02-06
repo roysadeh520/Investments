@@ -117,18 +117,21 @@ export function calculateFullMortgage(
   cpiLinkedPercent: number,
   nonLinkedRate: number,
   cpiLinkedRate: number,
-  years: number,
+  nonLinkedYears: number,
+  cpiLinkedYears: number,
   annualInflation: number
 ) {
   const cpiPrincipal = totalMortgage * (cpiLinkedPercent / 100);
   const nonLinkedPrincipal = totalMortgage - cpiPrincipal;
 
-  const nonLinked = calculateNonLinkedTrack(nonLinkedPrincipal, nonLinkedRate, years);
-  const cpiLinked = calculateCPILinkedTrack(cpiPrincipal, cpiLinkedRate, years, annualInflation);
+  const nonLinked = calculateNonLinkedTrack(nonLinkedPrincipal, nonLinkedRate, nonLinkedYears);
+  const cpiLinked = calculateCPILinkedTrack(cpiPrincipal, cpiLinkedRate, cpiLinkedYears, annualInflation);
 
   const initialMonthlyPayment = nonLinked.monthlyPayment + cpiLinked.monthlyPayment;
   const totalPaid = nonLinked.totalPaid + cpiLinked.totalPaid;
   const totalInterest = nonLinked.totalInterest + cpiLinked.totalInterest;
+
+  const maxYears = Math.max(nonLinkedYears, cpiLinkedYears);
 
   return {
     nonLinked,
@@ -136,7 +139,12 @@ export function calculateFullMortgage(
     initialMonthlyPayment,
     totalPaid,
     totalInterest,
-    paymentAtMonth: (month: number) => nonLinked.monthlyPayment + cpiLinked.paymentAtMonth(month),
+    maxYears,
+    paymentAtMonth: (month: number) => {
+      const nlPayment = month <= nonLinkedYears * 12 ? nonLinked.monthlyPayment : 0;
+      const cpiPayment = month <= cpiLinkedYears * 12 ? cpiLinked.paymentAtMonth(month) : 0;
+      return nlPayment + cpiPayment;
+    },
     balanceAtMonth: (month: number) => nonLinked.balanceAtMonth(month) + cpiLinked.balanceAtMonth(month),
   };
 }

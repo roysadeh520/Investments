@@ -2,7 +2,7 @@ export type InvestmentType = 'stockMarket' | 'checkingAccount' | 'lowRisk' | 're
 
 export type TaxBracket = 'standard' | 'significant';
 
-export type RentalTaxTrack = '10percent' | 'exempt' | 'marginal';
+export type RentalTaxTrack = 'none' | '10percent' | 'exempt' | 'marginal';
 
 export interface GlobalInputs {
   inflationRate: number;
@@ -47,6 +47,7 @@ export interface RealEstateInputs {
   rentalTaxTrack: RentalTaxTrack;
   renovationCost: number;
   annualInsurance: number;
+  cpiLinkedYears: number;
 }
 
 export interface AppState {
