@@ -52,9 +52,11 @@ export interface RealEstateResult extends BaseInvestmentResult {
   totalRentalIncome: number;
   netRentalIncome: number;
   totalMaintenanceCosts: number;
+  totalMortgagePaid: number;
   remainingMortgage: number;
   equity: number;
   monthlyPaymentAtEnd: number;
+  monthlyCashFlow: number;
   cashOnCashReturn: number;
 }
 

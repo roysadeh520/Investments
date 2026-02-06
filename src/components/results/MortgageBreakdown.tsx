@@ -43,18 +43,28 @@ export default function MortgageBreakdown({ result }: Props) {
           />
         )}
         <ResultCard
-          label="סה״כ תשלומי משכנתא"
-          value={formatCurrency(mortgage.totalPaid)}
+          label="תזרים חודשי (שכירות - משכנתא)"
+          value={formatCurrency(result.monthlyCashFlow)}
+          subValue={result.monthlyCashFlow < 0 ? 'עוד כסף שיוצא מהכיס כל חודש' : 'עודף חודשי'}
+          isPositive={result.monthlyCashFlow > 0}
+          isNegative={result.monthlyCashFlow < 0}
+          large
         />
         <ResultCard
-          label="סה״כ ריבית"
+          label="סה״כ תשלומי משכנתא"
+          value={formatCurrency(result.totalMortgagePaid)}
+          isNegative
+        />
+        <ResultCard
+          label="סה״כ ריבית ששולמה"
           value={formatCurrency(mortgage.totalInterest)}
+          subValue="(מתוך תשלומי המשכנתא)"
           isNegative
         />
         <ResultCard
           label="שווי דירה עתידי"
           value={formatCurrency(result.futurePropertyValue)}
-          isPositive
+          isPositive={result.futurePropertyValue > result.totalUpfrontCosts}
         />
         <ResultCard
           label="יתרת משכנתא"
@@ -64,13 +74,14 @@ export default function MortgageBreakdown({ result }: Props) {
         <ResultCard
           label="הון עצמי (אקוויטי)"
           value={formatCurrency(result.equity)}
+          subValue="(שווי דירה - יתרת משכנתא)"
           isPositive={result.equity > 0}
           large
         />
         <ResultCard
           label="הכנסות שכירות (ברוטו)"
           value={formatCurrency(result.totalRentalIncome)}
-          isPositive
+          isPositive={result.totalRentalIncome > 0}
         />
         <ResultCard
           label="הכנסות שכירות (נטו)"
@@ -79,6 +90,13 @@ export default function MortgageBreakdown({ result }: Props) {
           isPositive={result.netRentalIncome > 0}
           isNegative={result.netRentalIncome < 0}
         />
+        {result.totalMaintenanceCosts > 0 && (
+          <ResultCard
+            label="עלויות תחזוקה וביטוח"
+            value={formatCurrency(result.totalMaintenanceCosts)}
+            isNegative
+          />
+        )}
       </div>
     </div>
   );
